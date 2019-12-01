@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.eighth.mapper.PersonMapper">
+  <resultMap id="BaseResultMap" type="com.eighth.pojo.Person">
+    <id column="username" jdbcType="VARCHAR" property="username" />
+    <result column="num" jdbcType="INTEGER" property="num" />
+    <result column="maxnum" jdbcType="INTEGER" property="maxnum" />
+    <result column="total" jdbcType="INTEGER" property="total" />
+    <result column="records" jdbcType="VARCHAR" property="records" />
+  </resultMap>
+  <select id="selectAll"  parameterType="int"  resultType="com.eighth.pojo.Person">
+  		select * from t_person ORDER BY total DESC limit 0,#{count} 
+  </select>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    username, num, maxnum, total, records
+  </sql>
+  <select id="selectByExample" parameterType="com.eighth.pojo.PersonExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    'false' as QUERYID,
+    <include refid="Base_Column_List" />
+    from t_person
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from t_person
+    where username = #{username,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from t_person
+    where username = #{username,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.eighth.pojo.Person">
+    insert into t_person (username, num, maxnum, 
+      total, records)
+    values (#{username,jdbcType=VARCHAR}, #{num,jdbcType=INTEGER}, #{maxnum,jdbcType=INTEGER}, 
+      #{total,jdbcType=INTEGER}, #{records,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.eighth.pojo.Person">
+    insert into t_person
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="username != null">
+        username,
+      </if>
+      <if test="num != null">
+        num,
+      </if>
+      <if test="maxnum != null">
+        maxnum,
+      </if>
+      <if test="total != null">
+        total,
+      </if>
+      <if test="records != null">
+        records,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="username != null">
+        #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="num != null">
+        #{num,jdbcType=INTEGER},
+      </if>
+      <if test="maxnum != null">
+        #{maxnum,jdbcType=INTEGER},
+      </if>
+      <if test="total != null">
+        #{total,jdbcType=INTEGER},
+      </if>
+      <if test="records != null">
+        #{records,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.eighth.pojo.Person">
+    update t_person
+    <set>
+      <if test="num != null">
+        num = #{num,jdbcType=INTEGER},
+      </if>
+      <if test="maxnum != null">
+        maxnum = #{maxnum,jdbcType=INTEGER},
+      </if>
+      <if test="total != null">
+        total = #{total,jdbcType=INTEGER},
+      </if>
+      <if test="records != null">
+        records = #{records,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where username = #{username,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.eighth.pojo.Person">
+    update t_person
+    set num = #{num,jdbcType=INTEGER},
+      maxnum = #{maxnum,jdbcType=INTEGER},
+      total = #{total,jdbcType=INTEGER},
+      records = #{records,jdbcType=VARCHAR}
+    where username = #{username,jdbcType=VARCHAR}
+  </update>
+</mapper>

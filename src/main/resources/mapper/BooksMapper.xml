@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.eighth.mapper.BooksMapper">
+  <resultMap id="BaseResultMap" type="com.eighth.pojo.Books">
+    <id column="bid" jdbcType="INTEGER" property="bid" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="author" jdbcType="VARCHAR" property="author" />
+    <result column="publish" jdbcType="VARCHAR" property="publish" />
+    <result column="price" jdbcType="DOUBLE" property="price" />
+    <result column="borrow" jdbcType="INTEGER" property="borrow" />
+    <result column="type" jdbcType="INTEGER" property="type" />
+    <result column="inventory" jdbcType="INTEGER" property="inventory" />
+    <result column="residue" jdbcType="INTEGER" property="residue" />
+    <result column="image" jdbcType="VARCHAR" property="image" />
+    <result column="username" jdbcType="VARCHAR" property="username" />
+    <result column="createtime" jdbcType="TIMESTAMP" property="createtime" />
+    <result column="visit" jdbcType="INTEGER" property="visit" />
+  </resultMap>
+    <!--显示所有书籍-->
+  <select id="showBooks" resultType="com.eighth.pojo.Books">
+    select * from t_books
+  </select>
+  
+  <!--显示指定分类的书籍-->
+  <select id="showSortBook" parameterType="java.lang.Integer" resultType="com.eighth.pojo.Books">
+    select * from t_books where type=#{type}
+  </select>
+  
+  
+  <!--查询-->
+  <select id="searchByBookName" parameterType="String" resultType="com.eighth.pojo.Books">
+    select * from t_books where name  like concat('%',#{information},'%')
+  </select>
+  <select id="searchByAuthor" parameterType="String" resultType="com.eighth.pojo.Books">
+    select * from t_books where author like concat('%',#{information},'%')
+  </select>
+  
+   <!--添加书籍-->
+  <insert id="addBook" parameterType="com.eighth.pojo.Books">
+    insert into t_books (name, author,
+                         publish, type,price,
+                         borrow, inventory, residue,
+                         image, username, createtime,
+                         visit)
+    values (#{name,jdbcType=VARCHAR}, #{author,jdbcType=VARCHAR},
+            #{publish,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER},
+            #{price,jdbcType=DOUBLE}, #{borrow,jdbcType=INTEGER},
+            #{inventory,jdbcType=INTEGER}, #{residue,jdbcType=INTEGER},
+            #{image, jdbcType=VARCHAR}, #{username,jdbcType=VARCHAR},
+            #{createtime,jdbcType=TIMESTAMP}, #{visit,jdbcType=INTEGER})
+  </insert>
+  
+    <!--批量删除-->
+  <delete id="deleteBookById" parameterType="java.lang.Integer">
+    delete from t_books
+    where bid = #{bid,jdbcType=INTEGER}
+  </delete>
+
+  <!--查询指定id的书-->
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from t_books
+    where bid = #{bid,jdbcType=INTEGER}
+  </select>
+
+  <!--更改信息-->
+  <update id="updateByPrimaryKey" parameterType="com.eighth.pojo.Books">
+    update t_books
+    set
+        borrow = #{borrow,jdbcType=INTEGER}
+    where bid = #{bid,jdbcType=INTEGER}
+  </update>
+  
+   <select id="selectAllByVisit"  parameterType="int"  resultType="com.eighth.pojo.Books">
+  		select * from t_books ORDER BY visit DESC limit 0,#{count} 
+  </select>
+  
+  <!--通过访问量排序  -->
+  <select id="sortByVisit" resultType="com.eighth.pojo.Books">
+  	select * from t_books ORDER BY visit DESC
+  </select>
+  <!--通过时间排序  -->
+  <select id="sortByCreatetime" resultType="com.eighth.pojo.Books">
+  	select * from t_books order by createtime desc
+  </select>
+  
+  <select id="selectSortByType" parameterType="int" resultType="com.eighth.pojo.Books">
+  	select * from t_books where type=#{sid}
+  </select>
+  
+  <!--分页查询  -->
+<select id="limitSelectByType" resultType="com.eighth.pojo.Books" >
+  	select * from t_books where type=#{0} limit #{1},#{2}
+  	</select>
+  <select id="selectByName" parameterType="String" resultType="com.eighth.pojo.Books">
+  		select * from t_books where name like concat('%',#{name},'%')
+  </select>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    bid, name, author, publish, price, borrow, type, inventory, residue, image, username, 
+    createtime, visit
+  </sql>
+  <select id="selectByExample" parameterType="com.eighth.pojo.BooksExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    'false' as QUERYID,
+    <include refid="Base_Column_List" />
+    from t_books
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from t_books
+    where bid = #{bid,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.eighth.pojo.Books">
+    insert into t_books (bid, name, author, 
+      publish, price, borrow, 
+      type, inventory, residue, 
+      image, username, createtime, 
+      visit)
+    values (#{bid,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{author,jdbcType=VARCHAR}, 
+      #{publish,jdbcType=VARCHAR}, #{price,jdbcType=DOUBLE}, #{borrow,jdbcType=INTEGER}, 
+      #{type,jdbcType=INTEGER}, #{inventory,jdbcType=INTEGER}, #{residue,jdbcType=INTEGER}, 
+      #{image,jdbcType=VARCHAR}, #{username,jdbcType=VARCHAR}, #{createtime,jdbcType=TIMESTAMP}, 
+      #{visit,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.eighth.pojo.Books">
+    insert into t_books
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="bid != null">
+        bid,
+      </if>
+      <if test="name != null">
+        name,
+      </if>
+      <if test="author != null">
+        author,
+      </if>
+      <if test="publish != null">
+        publish,
+      </if>
+      <if test="price != null">
+        price,
+      </if>
+      <if test="borrow != null">
+        borrow,
+      </if>
+      <if test="type != null">
+        type,
+      </if>
+      <if test="inventory != null">
+        inventory,
+      </if>
+      <if test="residue != null">
+        residue,
+      </if>
+      <if test="image != null">
+        image,
+      </if>
+      <if test="username != null">
+        username,
+      </if>
+      <if test="createtime != null">
+        createtime,
+      </if>
+      <if test="visit != null">
+        visit,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="bid != null">
+        #{bid,jdbcType=INTEGER},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="author != null">
+        #{author,jdbcType=VARCHAR},
+      </if>
+      <if test="publish != null">
+        #{publish,jdbcType=VARCHAR},
+      </if>
+      <if test="price != null">
+        #{price,jdbcType=DOUBLE},
+      </if>
+      <if test="borrow != null">
+        #{borrow,jdbcType=INTEGER},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=INTEGER},
+      </if>
+      <if test="inventory != null">
+        #{inventory,jdbcType=INTEGER},
+      </if>
+      <if test="residue != null">
+        #{residue,jdbcType=INTEGER},
+      </if>
+      <if test="image != null">
+        #{image,jdbcType=VARCHAR},
+      </if>
+      <if test="username != null">
+        #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="createtime != null">
+        #{createtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="visit != null">
+        #{visit,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.eighth.pojo.Books">
+    update t_books
+    <set>
+      <if test="name != null">
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="author != null">
+        author = #{author,jdbcType=VARCHAR},
+      </if>
+      <if test="publish != null">
+        publish = #{publish,jdbcType=VARCHAR},
+      </if>
+      <if test="price != null">
+        price = #{price,jdbcType=DOUBLE},
+      </if>
+      <if test="borrow != null">
+        borrow = #{borrow,jdbcType=INTEGER},
+      </if>
+      <if test="type != null">
+        type = #{type,jdbcType=INTEGER},
+      </if>
+      <if test="inventory != null">
+        inventory = #{inventory,jdbcType=INTEGER},
+      </if>
+      <if test="residue != null">
+        residue = #{residue,jdbcType=INTEGER},
+      </if>
+      <if test="image != null">
+        image = #{image,jdbcType=VARCHAR},
+      </if>
+      <if test="username != null">
+        username = #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="createtime != null">
+        createtime = #{createtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="visit != null">
+        visit = #{visit,jdbcType=INTEGER},
+      </if>
+    </set>
+    where bid = #{bid,jdbcType=INTEGER}
+  </update>
+</mapper>
